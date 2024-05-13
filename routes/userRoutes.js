@@ -4,7 +4,8 @@ const {
   loginUser,
   getAllUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getAUser
 } = require("../controllers/userCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const userRouter = express.Router();
@@ -16,6 +17,7 @@ userRouter.post("/login", loginUser);
 
 /* All GET Routes */
 userRouter.get("/users", getAllUser);
+userRouter.get("/:id", authMiddleware, getAUser);
 
 /* All PUT Routes */
 userRouter.put("/update-profile", authMiddleware, updateUser);

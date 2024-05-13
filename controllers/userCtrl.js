@@ -52,6 +52,19 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+/* Get A User */
+
+const getAUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  try {
+    const getProfile = await User.findById(id);
+    res.status(200).json({ status: true, message: "User Found", getProfile });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 /* Get All User */
 
 const getAllUser = asyncHandler(async (req, res) => {
@@ -98,4 +111,4 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = {registerAUser, loginUser, getAllUser, updateUser, deleteUser}
+module.exports = {registerAUser, loginUser, getAllUser, updateUser, deleteUser, getAUser}
