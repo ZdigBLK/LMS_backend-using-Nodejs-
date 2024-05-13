@@ -2,7 +2,7 @@ const { generateToken } = require("../config/jwtToken");
 const validateMongodbId = require("../config/validateMongoDB");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
-
+const crypto = require("crypto");
 
 
 /* Create A User */
@@ -175,6 +175,39 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
+/* forgot password token */
+
+const forgotPasswordToken = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email: email });
+  if (!user) throw new Error("User Not Exists with this email.");
+  try {
+    const token = await user.createPasswordResetToken();
+    await user.save();
+    const resetlink = `http://localhost:4000/api/user/reset-password/${token}`;
+    res.status(200).json(resetlink);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!user) throw new Error("Token Expired, Please try again.");
+  user.password = password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+  res
+    .status(200)
+    .json({ status: true, message: "Password Reset Successfully" });
+});
 
 module.exports = {
   registerAUser, 
@@ -185,5 +218,7 @@ module.exports = {
   getAUser,
   blockUser,
   unblockUser,
-  updatePassword
+  updatePassword,
+  forgotPasswordToken,
+  resetPassword
 }
