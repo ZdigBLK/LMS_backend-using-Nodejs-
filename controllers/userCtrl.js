@@ -1,3 +1,5 @@
+const { generateToken } = require("../config/jwtToken");
+const validateMongodbId = require("../config/validateMongoDB");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 
@@ -30,4 +32,54 @@ const registerAUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = {registerAUser}
+/* Login User */
+
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  /* check if user exists or not */
+  const findUser = await User.findOne({ email: email });
+  if (findUser && (await findUser.isPasswordMatched(password))) {
+    res.status(200).json({
+      status: true,
+      message: "Logged In Successfully!",
+      token: generateToken(findUser?._id),
+      role: findUser?.roles,
+      username: findUser?.firstname + " " + findUser?.lastname,
+      user_image: findUser?.user_image,
+    });
+  } else {
+    throw new Error("Invalid Credentials");
+  }
+});
+
+/* Get All User */
+
+const getAllUser = asyncHandler(async (req, res) => {
+  try {
+    const allUser = await User.find();
+    res.status(200).json({
+      status: true,
+      message: "All Users Fetched Successfully",
+      allUser,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+/* Update A user profile */
+
+const updateUser = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongodbId(_id);
+  try {
+    const user = await User.findByIdAndUpdate(_id, req.body, { new: true });
+    res
+      .status(200)
+      .json({ status: true, message: "Profile Updated Successfully!", user });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = {registerAUser, loginUser, getAllUser, updateUser}

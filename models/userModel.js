@@ -63,4 +63,10 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+//  check whether a plain text password matches the hashed password stored
+
+userSchema.methods.isPasswordMatched = async function (enteredpassword) {
+  return await bcrypt.compare(enteredpassword, this.password);
+};
+
 module.exports = mongoose.model("User", userSchema);
