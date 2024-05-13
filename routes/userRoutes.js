@@ -3,7 +3,8 @@ const {
   registerAUser,
   loginUser,
   getAllUser,
-  updateUser
+  updateUser,
+  deleteUser
 } = require("../controllers/userCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const userRouter = express.Router();
@@ -18,6 +19,10 @@ userRouter.get("/users", getAllUser);
 
 /* All PUT Routes */
 userRouter.put("/update-profile", authMiddleware, updateUser);
+
+/* All DELETE Routes */
+userRouter.delete("/:id", authMiddleware, deleteUser);
+
 
 
 

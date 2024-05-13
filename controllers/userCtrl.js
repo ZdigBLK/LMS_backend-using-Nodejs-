@@ -70,6 +70,7 @@ const getAllUser = asyncHandler(async (req, res) => {
 /* Update A user profile */
 
 const updateUser = asyncHandler(async (req, res) => {
+  console.log("updateUser ('****************** From userCtrl.js ******************')");
   const { _id } = req.user;
   validateMongodbId(_id);
   try {
@@ -82,4 +83,19 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = {registerAUser, loginUser, getAllUser, updateUser}
+/* delete a user */
+
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  try {
+    await User.findByIdAndDelete(id);
+    res
+      .status(200)
+      .json({ status: true, message: "User Deleted Successfully" });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = {registerAUser, loginUser, getAllUser, updateUser, deleteUser}
