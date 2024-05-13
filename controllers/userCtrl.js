@@ -83,7 +83,7 @@ const getAllUser = asyncHandler(async (req, res) => {
 /* Update A user profile */
 
 const updateUser = asyncHandler(async (req, res) => {
-  console.log("updateUser ('****************** From userCtrl.js ******************')");
+  // console.log("updateUser ('****************** From userCtrl.js ******************')");
   const { _id } = req.user;
   validateMongodbId(_id);
   try {
@@ -111,4 +111,55 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = {registerAUser, loginUser, getAllUser, updateUser, deleteUser, getAUser}
+/* Block A User */
+
+const blockUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  try {
+    const block = await User.findByIdAndUpdate(
+      id,
+      { isblocked: true },
+      // The { new: true } option ensures that the updated user document is returned
+      // By setting { new: true }, you're instructing MongoDB to return the modified document rather than
+      // the original one. This means that after the update operation is completed, the block variable in your 
+      // code will contain the updated user document.
+      { new: true } 
+    );
+    res
+      .status(200)
+      .json({ status: true, message: "User Blocked Successfully" });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+/* Unblock A User */
+
+const unblockUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  try {
+    const unblock = await User.findByIdAndUpdate(
+      id,
+      { isblocked: false },
+      { new: true }
+    );
+    res
+      .status(200)
+      .json({ status: true, message: "User UnBlocked Successfully" });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = {
+  registerAUser, 
+  loginUser, 
+  getAllUser, 
+  updateUser, 
+  deleteUser, 
+  getAUser,
+  blockUser,
+  unblockUser
+}
