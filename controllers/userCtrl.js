@@ -153,6 +153,29 @@ const unblockUser = asyncHandler(async (req, res) => {
   }
 });
 
+/* Update a User */
+
+const updatePassword = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const { password } = req.body;
+  validateMongodbId(_id);
+  try {
+    const user = await User.findById(_id);
+    if (user && (await user.isPasswordMatched(password))) {
+      throw new Error("Please provide a new password instead of old one.");
+    } else {
+      user.password = password;
+      await user.save();
+      res
+        .status(200)
+        .json({ status: true, message: "Password updated Successfully" });
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+
 module.exports = {
   registerAUser, 
   loginUser, 
@@ -161,5 +184,6 @@ module.exports = {
   deleteUser, 
   getAUser,
   blockUser,
-  unblockUser
+  unblockUser,
+  updatePassword
 }

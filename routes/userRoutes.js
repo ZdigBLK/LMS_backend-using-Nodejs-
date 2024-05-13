@@ -7,7 +7,8 @@ const {
   deleteUser,
   getAUser,
   blockUser,
-  unblockUser
+  unblockUser,
+  updatePassword
 } = require("../controllers/userCtrl");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const userRouter = express.Router();
@@ -25,6 +26,7 @@ userRouter.get("/:id", authMiddleware, getAUser);
 userRouter.put("/update-profile", authMiddleware, updateUser);
 userRouter.put("/block/:id", authMiddleware, blockUser);
 userRouter.put("/unblock/:id", authMiddleware, unblockUser);
+userRouter.put("/update-password", authMiddleware, updatePassword);
 
 /* All DELETE Routes */
 userRouter.delete("/:id", authMiddleware, deleteUser);
