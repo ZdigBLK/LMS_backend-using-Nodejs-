@@ -6,7 +6,9 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
+const passportSetup = require("./utils/passport");
 const googleRouter = require("./routes/googleRoutes");
+const { tutCatRouter } = require("./routes/tutCatRoutes");
 const app = express()
 const dotenv = require("dotenv").config();
 const PORT = process.env.PORT || 5000
@@ -24,17 +26,18 @@ app.use(session({
 }))
 
 app.use(passport.initialize())
-app.use(passport.session)
+app.use(passport.session())
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 
 app.get("/", (req, res) => {
-    res.send("Hello from LMS Servre")
-})
+  res.send(`<a href="http://localhost:4000/google">login With Google</a>`);
+});
 
 app.use("/api/user", userRouter)
 app.use("/", googleRouter)
+app.use("/api/tutorial/category",tutCatRouter)
 
 app.use(notFound)
 app.use(handleError)

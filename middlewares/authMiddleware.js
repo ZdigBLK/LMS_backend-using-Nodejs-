@@ -33,4 +33,14 @@ const isInstructor = asyncHandler(async (req, res, next) => {
     }
 })
 
-module.exports = { authMiddleware, isInstructor };
+const restrictTo = (...roles) => {
+  return asyncHandler(async (req, res, next) => {
+    if (!roles.includes(req.user.roles)) {
+      throw new Error("You are not authorized.");
+    } else {
+      next();
+    }
+  });
+};
+
+module.exports = { authMiddleware, isInstructor, restrictTo };
